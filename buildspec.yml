@@ -1,0 +1,28 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 12.x
+    commands:
+      - echo 'Install CDK'
+      - npm install -g aws-cdk
+      - npm install
+  pre_build:
+    commands:
+      - echo 'Checking current Identity'
+      - aws sts get-caller-identity
+      - echo 'Assume Account B Role'
+      - CREDENTIALS=$(aws sts assume-role --role-arn $ASSUMED_ROLE_ARN --role-session-name $SESSION_NAME --duration-seconds $SESSION_DURATION)
+      - AWS_ACCESS_KEY_ID=$(echo $CREDENTIALS | jq -r '.["Credentials"] | .["AccessKeyId"]')
+      - AWS_SECRET_ACCESS_KEY=$(echo $CREDENTIALS | jq -r '.["Credentials"] | .["SecretAccessKey"]')
+      - AWS_SESSION_TOKEN=$(echo $CREDENTIALS | jq -r '.["Credentials"] | .["SessionToken"]')
+      - export AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
+      - echo 'Checking assumed Identity'
+      - aws sts get-caller-identity
+  build:
+    commands:
+      - echo "running package.json script deploy 'npm install; npm run build; cdk deploy --require-approval never'"
+      - npm run deploy
+  post_build:
+    commands:
+      - echo "Done deploying things on Account B"
