@@ -36,6 +36,11 @@ The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
  - IAM role management with CDK
 
+**MacroStack and MacroUsageStack**, additional information:
+ 
+ - Creates a CFN Macro and use it. 
+ - Deploy `MacroStack` first and then `MacroUsageStack`.
+
 ## Scrap Section
 
 just a place to put temporary text...
